@@ -599,7 +599,8 @@ int elantech_detect(struct psmouse *psmouse, bool set_properties)
 	pr_debug("elantech.c: Elantech version query result 0x%02x, 0x%02x, 0x%02x.\n",
 		 param[0], param[1], param[2]);
 
-	if (param[0] == 0 || param[1] != 0) {
+	if ((param[0] == 0 || param[1] != 0) &&
+	    (param[0] != 4 && param[1] != 1 && param[2] != 1)) {
 		if (!force_elantech) {
 			pr_debug("elantech.c: Probably not a real Elantech touchpad. Aborting.\n");
 			return -1;
