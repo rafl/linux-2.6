@@ -251,13 +251,13 @@ static void elantech_report_absolute_v2(struct psmouse *psmouse)
 
 	switch (fingers) {
 	case 1:
-		/* byte 1: x15 x14 x13 x12 x11 x10 x9  x8
+		/* byte 1:  .   .   .   .   .  x10 x9  x8
 		   byte 2: x7  x6  x5  x4  x4  x2  x1  x0 */
-		input_report_abs(dev, ABS_X, (packet[1] << 8) | packet[2]);
-		/* byte 4: y15 y14 y13 y12 y11 y10 y8  y8
+		input_report_abs(dev, ABS_X, ((packet[1] & 0x07) << 8) | packet[2]);
+		/* byte 4:  .   .   .   .   .   .  y8  y8
 		   byte 5: y7  y6  y5  y4  y3  y2  y1  y0 */
 		input_report_abs(dev, ABS_Y, ETP_YMAX_V2 -
-			((packet[4] << 8) | packet[5]));
+			(((packet[4] & 0x03) << 8) | packet[5]));
 		break;
 
 	case 2:
