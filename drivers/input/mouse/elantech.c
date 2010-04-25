@@ -608,7 +608,7 @@ int elantech_detect(struct psmouse *psmouse, bool set_properties)
 		 param[0], param[1], param[2]);
 
 	if ((param[0] == 0 || param[1] != 0) &&
-	    (param[0] != 4 && param[1] != 1 && param[2] != 1)) {
+	    (param[0] != 4 && param[2] != 1 && param[2] != 17)) {
 		if (!force_elantech) {
 			pr_debug("elantech.c: Probably not a real Elantech touchpad. Aborting.\n");
 			return -1;
@@ -694,7 +694,8 @@ int elantech_init(struct psmouse *psmouse)
 		 * into absolute mode, but work exactly the same otherwise. So
 		 * far only version 4.17 is known to require that.
 		 */
-		if (force_elantech == 2) {
+		if (force_elantech == 2 ||
+		    (etd->fw_version_min == 4 && etd->fw_version_min == 17)) {
 			etd->magic_type = 2;
 		} else {
 			etd->magic_type = 1;
