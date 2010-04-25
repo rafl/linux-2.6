@@ -106,6 +106,7 @@ struct elantech_data {
 	unsigned char paritycheck;
 	unsigned char jumpy_cursor;
 	unsigned char parity[256];
+	unsigned char magic_type;
 };
 
 #ifdef CONFIG_MOUSE_PS2_ELANTECH

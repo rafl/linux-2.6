@@ -26,8 +26,8 @@
 	} while (0)
 
 static unsigned int force_elantech;
-module_param_named(force_elantech, force_elantech, bool, 0644);
-MODULE_PARM_DESC(force_elantech, "Force the Elantech PS/2 protocol extension to be used, 1 = enabled, 0 = disabled (default).");
+module_param_named(force_elantech, force_elantech, uint, 0644);
+MODULE_PARM_DESC(force_elantech, "Force Elantech PS/2 protocol extension with the given magic version to be used (0 = disabled).");
 
 /*
  * Send a Synaptics style sliced query command
@@ -371,7 +371,15 @@ static int elantech_set_absolute_mode(struct psmouse *psmouse)
 
 	case 2:
 					/* Windows driver values */
-		etd->reg_10 = 0x54;
+		switch (etd->magic_type) {
+		case 1:
+			etd->reg_10 = 0x54;
+			break;
+		case 2:
+			etd->reg_10 = 0x0c;
+			break;
+		}
+
 		etd->reg_11 = 0x88;	/* 0x8a */
 		etd->reg_21 = 0x60;	/* 0x00 */
 		if (elantech_write_reg(psmouse, 0x10, etd->reg_10) ||
@@ -682,6 +690,15 @@ int elantech_init(struct psmouse *psmouse)
 		etd->debug = 1;
 		/* Don't know how to do parity checking for version 2 */
 		etd->paritycheck = 0;
+		/* Some firmware versions require a different magic to be put
+		 * into absolute mode, but work exactly the same otherwise. So
+		 * far only version 4.17 is known to require that.
+		 */
+		if (force_elantech == 2) {
+			etd->magic_type = 2;
+		} else {
+			etd->magic_type = 1;
+		}
 	} else {
 		etd->hw_version = 1;
 		etd->paritycheck = 1;
